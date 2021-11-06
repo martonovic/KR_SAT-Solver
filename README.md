@@ -1,2 +1,2 @@
 # KR_SAT-Solver
-SAT Solver implementation for Knowledge Representation (2021) course at VU
+SAT Solver implementation for Knowledge Representation course (2021) at VU
