@@ -6,15 +6,13 @@ import testing as tst
 from simplification import *
 from preprocessing import *
 import S1 as s1
-import S2 as s2
-import S3 as s3
 import argparse
 
 # here are the arguments that you want to give to the program from the terminal/command line
 parser = argparse.ArgumentParser(description='sudoku SAT solver')
-parser.add_argument('-S1', '--sudoku1', metavar='', help='input puzzle')
-parser.add_argument('-S2', '--sudoku2', metavar='', help='input puzzle')
-parser.add_argument('-S3', '--sudoku3', metavar='', help='input puzzle')
+parser.add_argument('-S1', '--sudoku1', metavar='', help='input puzzle: file or directory')
+parser.add_argument('-S2', '--sudoku2', metavar='', help='input puzzle: file or directory')
+parser.add_argument('-S3', '--sudoku3', metavar='', help='input puzzle: file or directory')
 
 call = parser.parse_args()
 
@@ -100,7 +98,12 @@ if __name__ == "__main__":
     sudoku_names = []
     cd = os.getcwd()
 
-    for file in glob.glob(example + "/sudoku*.txt"): # ("*.txt") for single file, otherwise directory
+    if os.path.isdir(example):
+        dir_loc = example + "/sudoku*.txt"
+    else:
+        dir_loc = example
+
+    for file in glob.glob(dir_loc): # ("*.txt") for single file, otherwise directory
         print(file)
         sudoku_name = os.path.basename(file)
         sudoku_names.append(sudoku_name)

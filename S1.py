@@ -10,7 +10,7 @@ def solve(tree: dict, variables: list, heur: str):
     # simplify formula and check if it's unsatisfiable with chosen assignments
     tree["arguments"].append([])
     tree["arguments"][-1], tree["assignments"], tree["validity_check"] = simplify(tree["arguments"][-2], tree["assignments"], tree["validity_check"])
-    print('----||---- working ----||----', 'number of assignments:', len(tree["assignments"]))
+    print('[INFO - ASSIGNMENTS]', '  number of assignments:', len(tree["assignments"]))
 
     # this is just unit propagation
     while any(len(clause) == 1 for clause in tree["arguments"][-1]) and tree["validity_check"]:
@@ -45,6 +45,7 @@ def solve(tree: dict, variables: list, heur: str):
 
     # otherwise, backtrack...
     else:
+        print('[INFO - UNIT PROPAGATION]', '  number of units propagated:', len(tree["units"]))
         # bigger backtracking steps can be taken IF the last assignments made have been either backtracked on
         # OR if the assignments were made through unit propagation
         while (len(tree["assignments"]) > 1 and abs(tree["assignments"][-1]) in tree["backtrack"]) or \
@@ -70,10 +71,10 @@ def solve(tree: dict, variables: list, heur: str):
 
         # if everything has been backtracked on, formula is unsatisfiable --> exits function
         if len(tree["assignments"]) == 1 and len(tree["backtrack"]) == 1 and abs(tree["assignments"][0]) in tree["backtrack"]:
-            first_backtrack = tree["backtrack"][0]
+            tree["first_backtrack"] = tree["backtrack"][0]
 
         tree["backtrack_counter"].append(tree["backtrack"][-1])
-        print('...lots of backtracking.... nr. backtracks:', len(tree["backtrack_counter"]))
+        print('[INFO - BACKTRACKING]  nr. backtracks:', len(tree["backtrack_counter"]))
         solve(tree, variables, heur)
 
     return tree

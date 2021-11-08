@@ -1,9 +1,8 @@
 import os
 
 
-def create_output(assignments, sudoku_name, difficulty_level, version):  # pass difficulty_level as string
+def create_output(assignments, sudoku_name, directory, version):  # pass difficulty_level as string
     current_path = os.getcwd()
-    directory = difficulty_level
     newpath = os.path.join(current_path, directory, version)
     if not os.path.exists(newpath):
         os.makedirs(newpath)
