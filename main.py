@@ -1,4 +1,7 @@
 import sys
+import os
+import glob
+import time
 import testing as tst
 from simplification import *
 from preprocessing import *
@@ -16,7 +19,7 @@ parser.add_argument('-S3', '--sudoku3', metavar='', help='input puzzle')
 call = parser.parse_args()
 
 
-def main(version, input1):
+def run(heur, input1):
 
     # parse arguments
     full_argments = parseargs(input1)
@@ -24,53 +27,53 @@ def main(version, input1):
     # initialize variables:
     (variables, varbsCount, varbs) = getVars(full_argments)
 
-    # this is the random heuristic
+    # this is the random heuristic i.e. randomly predetermining the order of variables to search through
     #variables = random_heuristic(variables)
 
-    argments = tautology(full_argments)  # remove tautologies, just necessary once.
+    arguments = tautology(full_argments)  # remove tautologies, just necessary once.
 
     # initialization of lists (args & assignments) and boolean (validity_check)
-    validity_check = True
-    assments = []
-    backtrack = []
-    units = []
-    first_backtrack = 0
-    backtrack_counter = []
+    DPLL = {
+        "validity_check": True,
+        "arguments": [arguments],
+        "assignments": [],
+        "backtrack": [],
+        "units": [],
+        "first_backtrack": 0,
+        "backtrack_counter": [],
+    }
 
     sys.setrecursionlimit(10 ** 8)
 
-    while any(len(clause) == 1 for clause in argments) and validity_check:
-        variables, assments, units = unit_propagation(variables, argments, assments, units)
-        argments, assments, validity_check = simplify(argments, assments, validity_check)
-    init_units = units.copy()
-    print(units)
-    del units
-    units = []
-    argies = argments.copy()
-    # initialize variables again (after first round of :
-    (variables1, varbsCount, varbs) = getVars(argments)
-    init_assignments = assments.copy()
-    assments = []
+    # iniitial unit propagation and simplification --> majority of clauses removed
+    while any(len(clause) == 1 for clause in DPLL["arguments"][-1]) and DPLL["validity_check"]:
+        variables, DPLL["assignments"], DPLL["units"] = unit_propagation(variables, DPLL["arguments"][-1], DPLL["assignments"], DPLL["units"])
+        DPLL["arguments"][-1], DPLL["assignments"], DPLL["validity_check"] = simplify(DPLL["arguments"][-1], DPLL["assignments"], DPLL["validity_check"])
+
+    units = DPLL["units"].copy()
+    init_assignments = DPLL["assignments"].copy()
+    assignments = init_assignments.copy()
+    DPLL["units"] = []
+    DPLL["assignments"] = []
+
+    # initialize variables again (after first round of simplification):
+    (variables1, varbsCount, varbs) = getVars(DPLL["arguments"][-1])
 
     # start recursive function
-    if version == 'S1':
-        assments, backtrack_counter, units = s1.solve(argies, assments, variables1, backtrack, backtrack_counter, argments, units, first_backtrack)
-    elif version == 'S2':
-        assments, backtrack_counter, units = s2.solve(argies, assments, variables1, backtrack, backtrack_counter, argments, units, first_backtrack)
-    elif version == 'S3':
-        assments, backtrack_counter, units = s3.solve(argies, assments, variables1, backtrack, backtrack_counter, argments, units, first_backtrack)
 
-    if not validity_check:
+    DPLL = s1.solve(DPLL, variables1, heur)
+
+    if not DPLL["validity_check"]:
         message = 'failure'
     else:
         message = 'Success! This formula is satisfiable, with the following assignments: '
 
-    for atoms in init_assignments:
-        assments.append(atoms)
-    for unit in init_units:
+    for atoms in DPLL["assignments"]:
+        assignments.append(atoms)
+    for unit in DPLL["units"]:
         units.append(unit)
 
-    return init_assignments, assments, message, backtrack_counter, units
+    return init_assignments, assignments, message, DPLL["backtrack_counter"], units
 
 
 if call.sudoku1:
@@ -82,11 +85,11 @@ elif call.sudoku2:
 elif call.sudoku3:
     example = call.sudoku3
     version = 'S3'
+else:
+    example = os.getcwd()
+    version = "S1"
 
 if __name__ == "__main__":
-    import os
-    import glob
-    import time
 
     # initialize:
     tests = []
@@ -97,7 +100,7 @@ if __name__ == "__main__":
     sudoku_names = []
     cd = os.getcwd()
 
-    for file in glob.glob(example + "/*.txt"): # ("*.txt") for single file, otherwise directory
+    for file in glob.glob(example + "/sudoku*.txt"): # ("*.txt") for single file, otherwise directory
         print(file)
         sudoku_name = os.path.basename(file)
         sudoku_names.append(sudoku_name)
@@ -105,7 +108,7 @@ if __name__ == "__main__":
         # reset time
         last_time = time.time()
 
-        initial_assignments, assignments, message, backtrack_counter, unit_literals = main(version, file)
+        initial_assignments, assignments, message, backtrack_counter, unit_literals = run(version, file)
 
         path = tst.create_output(assignments, sudoku_name, example, version)
 

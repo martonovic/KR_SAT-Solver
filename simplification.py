@@ -84,7 +84,8 @@ def unit_propagation(variables, clauses, assmts, units):
         literals = clauses[n]
         if literals[0] not in assmts and -literals[0] not in assmts:
             assmts.append(literals[0])
-            if abs(literals[0]) not in units: units.append(abs(literals[0]))
+            if abs(literals[0]) not in units:
+                units.append(abs(literals[0]))
         n += 1
 
     return variables, assmts, units
@@ -92,19 +93,21 @@ def unit_propagation(variables, clauses, assmts, units):
 
 # function to simplify CNF with assignments and rules
 def simplify(clauses, assigns, validity_check):
+    # make copy
+    arguments = clauses.copy()
 
     # assign values to pure literals, can be left out: computationally expensive
     #assigns = pure_literals(clauses, varb, assigns)
 
     # shorten clauses
-    clauses1 = shorten_clause(clauses, assigns, validity_check)
+    arguments = shorten_clause(arguments, assigns, validity_check)
 
     if validity_check:
-        validity_check = val_check(clauses1, validity_check, assigns)
+        validity_check = val_check(arguments, validity_check, assigns)
 
     # remove true clauses
-    clauses2 = true_clauses(clauses1, assigns, validity_check)
+    arguments = true_clauses(arguments, assigns, validity_check)
 
-    validity_check = val_check(clauses, validity_check, assigns)
+    validity_check = val_check(arguments, validity_check, assigns)
 
-    return clauses2, assigns, validity_check
+    return arguments, assigns, validity_check

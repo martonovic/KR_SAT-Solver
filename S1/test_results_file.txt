@@ -1,0 +1,8 @@
+-----------------------------------------------------------
+Difficulty: 
+['sudoku_evil_test1.txt']
+Number of initial assignments: [593]
+Number of assignments: [729]
+Number of backtracks: [2]
+Number of unit literals: [726]
+Processing time in seconds: [3.2164957523345947]
