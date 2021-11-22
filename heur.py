@@ -1,5 +1,5 @@
 import random
-
+from collections import defaultdict
 
 def random_heuristic(variables):
     random.shuffle(variables)
@@ -45,3 +45,24 @@ def jw1_heuristic(literals, clauses):
     chosen_literal = max(j_value, key=j_value.get)
 
     return chosen_literal
+
+
+def DLIS_heuristic(clauses):
+    neg_count = defaultdict(int)
+    pos_count = defaultdict(int)
+
+    for clause in clauses:
+        for literal in clause:
+            if literal < 0:
+                neg_count[literal] += 1
+            else:
+                pos_count[literal] += 1
+
+
+    neg_chosen_literal = max(neg_count, key=neg_count.get)
+    pos_chosen_literal = max(pos_count, key=pos_count.get)
+
+    if pos_count[pos_chosen_literal] > neg_count[neg_chosen_literal]:
+        return pos_chosen_literal
+    else:
+        return neg_chosen_literal

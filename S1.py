@@ -32,6 +32,8 @@ def solve(tree: dict, variables: list, heur: str):
     elif heur == 'S3':
         varbs = [x for x in variables if (x not in tree["assignments"] and -x not in tree["assignments"])]
         next_lit = jw1_heuristic(varbs, tree["arguments"][-1])
+    elif heur == 'S4':
+        next_lit = DLIS_heuristic(tree["arguments"][-1])
     else:
         for var in variables:
             if var not in tree["assignments"] and -var not in tree["assignments"]:
