@@ -1,10 +1,12 @@
 import numpy as np
 
-file = open('4x4.txt', 'r')
-file2 = open('1000 sudokus.txt', 'r')
-file3 = open('top870.sdk.txt', 'r')
 
-def convert2dimacs(file):
+b = 16
+loc = 'tests/test2/'
+file = open('tests/test2/16x16.txt', 'r')
+file2 = open('1000_sudokus.txt', 'r')
+
+def convert2dimacs(file, location, base=10):
     lines = file.readlines()
     counter = 1
     for line in lines:
@@ -15,12 +17,18 @@ def convert2dimacs(file):
         sudoku_array = np.asarray([literal for literal in line])
         sudoku_matrix = np.reshape(sudoku_array, (n_rows, n_cols))
 
-        file_name = 'sudoku_{}x{}_{:05}.txt'.format(n_rows, n_cols, counter)
+        file_name = location + 'sudoku_{}x{}_{:05}.txt'.format(n_rows, n_cols, counter)
         with open(file_name, 'w') as f:
             for i in range(n_rows):
                 for j in range(n_cols):
                     if sudoku_matrix[i][j] != '.':
-                        value = sudoku_matrix[i][j]
-                        dimacs.append('{}{}{} 0\n'.format(i+1,j+1,value))
-                        f.write('{}{}{} 0\n'.format(i+1,j+1,value))
+                        if base > 10:
+                            tmp_val = int(sudoku_matrix[i][j], base+1)
+                            value = ((i+1)*((base+1)**2)) + ((j+1)*(base+1)) + tmp_val
+                        else:
+                            value = int(sudoku_matrix[i][j] + str(i+1) + str(j+1))
+                        dimacs.append('{} 0\n'.format(value))
+                        f.write('{} 0\n'.format(value))
         counter += 1
+
+convert2dimacs(file, loc, b)
