@@ -66,3 +66,19 @@ def DLIS_heuristic(clauses):
         return pos_chosen_literal
     else:
         return neg_chosen_literal
+
+def digit_to_char(digit):
+    if digit < 10:
+        return str(digit)
+    return chr(ord('a') + digit - 10)
+
+def str_base(number, base):
+    while number > 0:
+        number, digit = divmod(number, base)
+        yield digit_to_char(digit)
+
+def sudo_heruistic(assignments, base=10):
+    if base == 16:
+        assignments = [str_base(x, base+1) for x in assignments]
+    next_literal = assignments[-1]
+    return next_literal

@@ -13,6 +13,7 @@ parser = argparse.ArgumentParser(description='sudoku SAT solver')
 parser.add_argument('-S1', '--sudoku1', metavar='', help='input puzzle: file or directory')
 parser.add_argument('-S2', '--sudoku2', metavar='', help='input puzzle: file or directory')
 parser.add_argument('-S3', '--sudoku3', metavar='', help='input puzzle: file or directory')
+parser.add_argument('-S4', '--sudoku4', metavar='', help='input puzzle: file or directory')
 
 call = parser.parse_args()
 
@@ -83,6 +84,9 @@ elif call.sudoku2:
 elif call.sudoku3:
     example = call.sudoku3
     version = 'S3'
+elif call.sudoku4:
+    example = call.sudoku4
+    version = 'S4'
 else:
     example = os.getcwd()
     version = "S1"
@@ -108,11 +112,11 @@ if __name__ == "__main__":
         sudoku_name = os.path.basename(file)
         sudoku_names.append(sudoku_name)
         print(sudoku_name)
+
         # reset time
         last_time = time.time()
 
-        #initial_assignments, assignments, message, backtrack_counter, unit_literals = run(version, file)
-        initial_assignments, assignments, message, backtrack_counter, unit_literals = run(call.heur, file)
+        initial_assignments, assignments, message, backtrack_counter, unit_literals = run(version, file)
 
         path = tst.create_output(assignments, sudoku_name, example, version)
 
