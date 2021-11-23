@@ -1,6 +1,5 @@
 import os
 
-
 def create_output(assignments, sudoku_name, directory, version):  # pass difficulty_level as string
     current_path = os.getcwd()
     newpath = os.path.join(current_path, directory, version)

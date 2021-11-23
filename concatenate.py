@@ -1,5 +1,4 @@
-import glob
-import os
+from dependencies import *
 
 
 def concat(rules, location, destination):

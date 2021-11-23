@@ -1,5 +1,4 @@
-import numpy as np
-
+from dependencies import *
 
 b = 16
 loc = 'tests/test2/'

@@ -1,5 +1,4 @@
-import random
-from collections import defaultdict
+from dependencies import *
 
 def random_heuristic(variables):
     random.shuffle(variables)

@@ -1,12 +1,4 @@
-import sys
-import os
-import glob
-import time
-import testing as tst
-from simplification import *
-from preprocessing import *
-import solver as s1
-import argparse
+from dependencies import *
 
 # here are the arguments that you want to give to the program from the terminal/command line
 parser = argparse.ArgumentParser(description='sudoku SAT solver')
@@ -14,6 +6,7 @@ parser.add_argument('-S1', '--sudoku1', metavar='', help='input puzzle: file or 
 parser.add_argument('-S2', '--sudoku2', metavar='', help='input puzzle: file or directory')
 parser.add_argument('-S3', '--sudoku3', metavar='', help='input puzzle: file or directory')
 parser.add_argument('-S4', '--sudoku4', metavar='', help='input puzzle: file or directory')
+parser.add_argument('-S5', '--sudoku5', metavar='', help='input puzzle: file or directory')
 
 call = parser.parse_args()
 
@@ -27,7 +20,7 @@ def run(heur, input1):
     (variables, varbsCount, varbs) = getVars(full_argments)
 
     # this is the random heuristic i.e. randomly predetermining the order of variables to search through
-    #variables = random_heuristic(variables)
+    variables = random_heuristic(variables)
 
     arguments = tautology(full_argments)  # remove tautologies, just necessary once.
 
@@ -87,6 +80,9 @@ elif call.sudoku3:
 elif call.sudoku4:
     example = call.sudoku4
     version = 'S4'
+elif call.sudoku5:
+    example = call.sudoku5
+    version = 'S5'
 else:
     example = os.getcwd()
     version = "S1"

@@ -1,7 +1,4 @@
-from simplification import *
-from heur import *
-# from heur import random_heuristic
-
+from dependencies import *
 
 def solve(tree: dict, variables: list, heur: str):
 #def solve(arguments, assignments, variables, backtrack, backtrack_counter, simplified_arguments, units, first_backtrack):
