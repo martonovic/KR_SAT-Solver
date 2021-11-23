@@ -1,5 +1,4 @@
-from dependencies import *
-
+import os, glob
 
 def concat(rules, location, destination):
     file_loc = os.path.join(os.getcwd(), location)

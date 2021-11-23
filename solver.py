@@ -1,4 +1,5 @@
-from dependencies import *
+from simplification import *
+from heur import *
 
 def solve(tree: dict, variables: list, heur: str):
 #def solve(arguments, assignments, variables, backtrack, backtrack_counter, simplified_arguments, units, first_backtrack):
@@ -20,6 +21,7 @@ def solve(tree: dict, variables: list, heur: str):
 
     if len(tree["assignments"]) == len(variables) and not tree["validity_check"] and abs(tree["assignments"][-1]) not in tree["backtrack"]:
         tree["assignments"][-1] = -tree["assignments"][-1]
+        tree["recursion_depth"] += 1
         solve(tree, variables, heur)
         return tree
 
@@ -31,6 +33,9 @@ def solve(tree: dict, variables: list, heur: str):
         next_lit = jw1_heuristic(varbs, tree["arguments"][-1])
     elif heur == 'S4':
         next_lit = DLIS_heuristic(tree["arguments"][-1])
+    elif heur == 'S5':
+        varbs = [x for x in variables if (x not in tree["assignments"] and -x not in tree["assignments"])]
+        next_lit = sudo_heruistic(tree["init_assignments"] + tree["assignments"], varbs, base=16)
     else:
         for var in variables:
             if var not in tree["assignments"] and -var not in tree["assignments"]:
@@ -40,6 +45,7 @@ def solve(tree: dict, variables: list, heur: str):
     if tree["validity_check"]:
 
         tree["assignments"].append(next_lit)
+        tree["recursion_depth"] += 1
         solve(tree, variables, heur)
 
     # otherwise, backtrack...
@@ -74,6 +80,7 @@ def solve(tree: dict, variables: list, heur: str):
 
         tree["backtrack_counter"].append(tree["backtrack"][-1])
         print('[INFO - BACKTRACKING]  nr. backtracks:', len(tree["backtrack_counter"]))
+        tree["recursion_depth"] += 1
         solve(tree, variables, heur)
 
     return tree

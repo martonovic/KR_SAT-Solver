@@ -1,9 +1,8 @@
-from dependencies import *
+import numpy as np
 
 b = 16
-loc = 'tests/test2/'
-file = open('tests/test2/16x16.txt', 'r')
-file2 = open('1000_sudokus.txt', 'r')
+loc = 'tests/16x16_sudoku/'
+file = open('tests/16x16_sudoku/16x16.txt', 'r')
 
 def convert2dimacs(file, location, base=10):
     lines = file.readlines()

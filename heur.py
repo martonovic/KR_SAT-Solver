@@ -1,4 +1,5 @@
-from dependencies import *
+from collections import *
+import random
 
 def random_heuristic(variables):
     random.shuffle(variables)
@@ -76,8 +77,48 @@ def str_base(number, base):
         number, digit = divmod(number, base)
         yield digit_to_char(digit)
 
-def sudo_heruistic(assignments, base=10):
-    if base == 16:
-        assignments = [str_base(x, base+1) for x in assignments]
-    next_literal = assignments[-1]
-    return next_literal
+def sudo_heruistic(assignments, variables, base=9):
+    if base > 10:
+        tmp_assignments = [str_base(abs(x), base+1) for x in assignments]
+    else:
+        tmp_assignments = [str(abs(w)) for w in assignments]
+
+    row_count = [[i[0] for i in tmp_assignments].count(str(y)) for y in range(1, base+1)]
+    col_count = [[j[1] for j in tmp_assignments].count(str(z)) for z in range(1, base+1)]
+
+    row_min = min(row_count)
+    col_min = min(col_count)
+
+    if row_min < col_min:
+        row_ind = row_count.index(row_min)
+        col_val_inds = sorted(zip(col_count,range(base)))
+
+        for k in col_val_inds:
+            rand_select = list(range(1, base + 1))
+            random.shuffle(rand_select)
+            for l in rand_select:
+                chosen_lit = int(str(row_ind+1) + str(k[1]+1) + str(l))
+                if chosen_lit in variables:
+                    if random.random() > 0.5: chosen_lit = -chosen_lit
+                    print(chosen_lit)
+                    break
+            if chosen_lit in variables: break
+
+
+    else:
+        col_ind = col_count.index(col_min)
+        row_val_inds = sorted(zip(row_count,range(base)))
+
+        for k in row_val_inds:
+            rand_select = list(range(1, base + 1))
+            random.shuffle(rand_select)
+            for l in rand_select:
+                chosen_lit = int(str(k[1]+1) + str(col_ind+1) + str(l))
+                if chosen_lit in variables:
+                    if random.random() > 0.5: chosen_lit = -chosen_lit
+                    print(chosen_lit)
+                    break
+            if chosen_lit in variables: break
+
+
+    return chosen_lit

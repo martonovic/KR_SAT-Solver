@@ -1,4 +1,7 @@
-from dependencies import *
+import argparse, sys, glob, time
+from preprocessing import *
+from solver import *
+from testing import *
 
 # here are the arguments that you want to give to the program from the terminal/command line
 parser = argparse.ArgumentParser(description='sudoku SAT solver')
@@ -33,6 +36,7 @@ def run(heur, input1):
         "units": [],
         "first_backtrack": 0,
         "backtrack_counter": [],
+        "recursion_depth": 0,
     }
 
     sys.setrecursionlimit(10 ** 8)
@@ -43,8 +47,8 @@ def run(heur, input1):
         DPLL["arguments"][-1], DPLL["assignments"], DPLL["validity_check"] = simplify(DPLL["arguments"][-1], DPLL["assignments"], DPLL["validity_check"])
 
     units = DPLL["units"].copy()
-    init_assignments = DPLL["assignments"].copy()
-    assignments = init_assignments.copy()
+    DPLL["init_assignments"] = DPLL["assignments"].copy()
+    assignments = DPLL["init_assignments"].copy()
     DPLL["units"] = []
     DPLL["assignments"] = []
 
@@ -53,7 +57,7 @@ def run(heur, input1):
 
     # start recursive function
 
-    DPLL = s1.solve(DPLL, variables1, heur)
+    DPLL = solve(DPLL, variables1, heur)
 
     if not DPLL["validity_check"]:
         message = 'failure'
@@ -65,7 +69,7 @@ def run(heur, input1):
     for unit in DPLL["units"]:
         units.append(unit)
 
-    return init_assignments, assignments, message, DPLL["backtrack_counter"], units
+    return DPLL["init_assignments"], assignments, message, DPLL["backtrack_counter"], units
 
 
 if call.sudoku1:
@@ -85,7 +89,7 @@ elif call.sudoku5:
     version = 'S5'
 else:
     example = os.getcwd()
-    version = "S1"
+    version = "S5"
 
 if __name__ == "__main__":
 
@@ -114,7 +118,7 @@ if __name__ == "__main__":
 
         initial_assignments, assignments, message, backtrack_counter, unit_literals = run(version, file)
 
-        path = tst.create_output(assignments, sudoku_name, example, version)
+        path = create_output(assignments, sudoku_name, example, version)
 
         # measure time
         now_time = time.time() - last_time
@@ -136,7 +140,7 @@ if __name__ == "__main__":
         os.chdir(cd)
 
     os.chdir(path)
-    tst.collect_test_results(tests, sudoku_names, example, inits, backtracks, units,
+    collect_test_results(tests, sudoku_names, example, inits, backtracks, units,
                          times)
     print(tests)
     print(times)
