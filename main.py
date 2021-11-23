@@ -13,7 +13,6 @@ parser = argparse.ArgumentParser(description='sudoku SAT solver')
 parser.add_argument('-S1', '--sudoku1', metavar='', help='input puzzle: file or directory')
 parser.add_argument('-S2', '--sudoku2', metavar='', help='input puzzle: file or directory')
 parser.add_argument('-S3', '--sudoku3', metavar='', help='input puzzle: file or directory')
-parser.add_argument('--heur', '--heuristic', help='Choose heuristic to use')
 
 call = parser.parse_args()
 
@@ -25,11 +24,13 @@ def run(heur, input1):
 
     # initialize variables:
     (variables, varbsCount, varbs) = getVars(full_argments)
+
     # this is the random heuristic i.e. randomly predetermining the order of variables to search through
     #variables = random_heuristic(variables)
 
     arguments = tautology(full_argments)  # remove tautologies, just necessary once.
-    # initialization of lists (args & assignments) and boolean (validity_check)
+
+    # initialization of data structure
     DPLL = {
         "validity_check": True,
         "arguments": [arguments],
