@@ -22,4 +22,4 @@ def concat(rules, location, destination):
                     outfile.write(infile.read())
 
 
-concat('sudoku-rules-16x16.txt', 'tests/test2/', 'out')
+concat('sudoku-rules-16x16.txt', 'tests/16x16_sudoku/', 'out')
