@@ -5,7 +5,7 @@ import time
 import testing as tst
 from simplification import *
 from preprocessing import *
-import S1 as s1
+import solver as s1
 import argparse
 
 # here are the arguments that you want to give to the program from the terminal/command line
