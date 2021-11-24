@@ -94,7 +94,7 @@ elif call.sudoku5:
     version = 'S5'
 else:
     example = os.getcwd()
-    version = "S3"
+    version = "S4"
 
 if __name__ == "__main__":
 
