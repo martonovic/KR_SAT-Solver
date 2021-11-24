@@ -34,8 +34,8 @@ def solve(tree: dict, variables: list, heur: str):
     elif heur == 'S4':
         next_lit = DLIS_heuristic(tree["arguments"][-1])
     elif heur == 'S5':
-        varbs = [x for x in variables if (x not in tree["assignments"] and -x not in tree["assignments"])]
-        next_lit = sudo_heruistic(tree["init_assignments"] + tree["assignments"], varbs, base=16)
+        varbs = [abs(x) for x in variables if (x not in tree["assignments"] and -x not in tree["assignments"])]
+        next_lit = sudo_heruistic(tree["init_assignments"] + tree["assignments"], varbs)
     else:
         for var in variables:
             if var not in tree["assignments"] and -var not in tree["assignments"]:
@@ -60,6 +60,7 @@ def solve(tree: dict, variables: list, heur: str):
             while len(tree["assignments"]) > 1 and abs(tree["assignments"][-1]) in tree["backtrack"]:
                 del tree["backtrack"][tree["backtrack"].index(abs(tree["assignments"][-1]))]
                 del tree["assignments"][-1]
+                del tree["arguments"][-1]
             # this is to remove the most recently added unit literals, makes testing quicker
             while len(tree["assignments"]) > 1 and abs(tree["assignments"][-1]) in tree["units"]:
                 del tree["units"][tree["units"].index(abs(tree["assignments"][-1]))]

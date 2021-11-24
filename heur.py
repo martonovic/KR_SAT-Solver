@@ -1,15 +1,13 @@
 from collections import *
 import random
+import numpy as np
 
 def random_heuristic(variables):
     random.shuffle(variables)
-    flip = 1
     for varb in variables:
-        if flip == 1:
+        if random.random() > 0.5:
             variables[variables.index(varb)] = -varb
-        flip = -flip
-    random.shuffle(variables)
-
+    print(variables)
     return variables
 
 
@@ -67,19 +65,10 @@ def DLIS_heuristic(clauses):
     else:
         return neg_chosen_literal
 
-def digit_to_char(digit):
-    if digit < 10:
-        return str(digit)
-    return chr(ord('a') + digit - 10)
 
-def str_base(number, base):
-    while number > 0:
-        number, digit = divmod(number, base)
-        yield digit_to_char(digit)
-
-def sudo_heruistic(assignments, variables, base=9):
+def sudo_heruistic(assignments, varbs, base=9):
     if base > 10:
-        tmp_assignments = [str_base(abs(x), base+1) for x in assignments]
+        tmp_assignments = [str(np.base_repr(abs(x), base+1)) for x in assignments]
     else:
         tmp_assignments = [str(abs(w)) for w in assignments]
 
@@ -89,36 +78,28 @@ def sudo_heruistic(assignments, variables, base=9):
     row_min = min(row_count)
     col_min = min(col_count)
 
+    row_val_inds = sorted(zip(row_count, range(base)))
+    col_val_inds = sorted(zip(col_count, range(base)))
+
+    rand_select = list(range(1, base + 1))
+    random.shuffle(rand_select)
+
     if row_min < col_min:
-        row_ind = row_count.index(row_min)
-        col_val_inds = sorted(zip(col_count,range(base)))
+        for k in row_val_inds:
+            for l in col_val_inds:
+                for m in rand_select:
+                    chosen_lit = int(str(k[1]+1) + str(l[1]+1) + str(m))
 
-        for k in col_val_inds:
-            rand_select = list(range(1, base + 1))
-            random.shuffle(rand_select)
-            for l in rand_select:
-                chosen_lit = int(str(row_ind+1) + str(k[1]+1) + str(l))
-                if chosen_lit in variables:
-                    if random.random() > 0.5: chosen_lit = -chosen_lit
-                    print(chosen_lit)
-                    break
-            if chosen_lit in variables: break
-
+                    if chosen_lit in varbs:
+                        if random.random() > 0.5: chosen_lit = -chosen_lit
+                        return chosen_lit
 
     else:
-        col_ind = col_count.index(col_min)
-        row_val_inds = sorted(zip(row_count,range(base)))
+        for l in col_val_inds:
+            for k in row_val_inds:
+                for m in rand_select:
+                    chosen_lit = int(str(k[1]+1) + str(l[1]+1) + str(m))
 
-        for k in row_val_inds:
-            rand_select = list(range(1, base + 1))
-            random.shuffle(rand_select)
-            for l in rand_select:
-                chosen_lit = int(str(k[1]+1) + str(col_ind+1) + str(l))
-                if chosen_lit in variables:
-                    if random.random() > 0.5: chosen_lit = -chosen_lit
-                    print(chosen_lit)
-                    break
-            if chosen_lit in variables: break
-
-
-    return chosen_lit
+                    if chosen_lit in varbs:
+                        if random.random() > 0.5: chosen_lit = -chosen_lit
+                        return chosen_lit

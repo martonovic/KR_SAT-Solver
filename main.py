@@ -15,15 +15,11 @@ call = parser.parse_args()
 
 
 def run(heur, input1):
-
     # parse arguments
     full_argments = parseargs(input1)
 
     # initialize variables:
     (variables, varbsCount, varbs) = getVars(full_argments)
-
-    # this is the random heuristic i.e. randomly predetermining the order of variables to search through
-    variables = random_heuristic(variables)
 
     arguments = tautology(full_argments)  # remove tautologies, just necessary once.
 
@@ -39,12 +35,17 @@ def run(heur, input1):
         "recursion_depth": 0,
     }
 
-    sys.setrecursionlimit(10 ** 8)
+    sys.setrecursionlimit(10 ** 9)
 
     # iniitial unit propagation and simplification --> majority of clauses removed
     while any(len(clause) == 1 for clause in DPLL["arguments"][-1]) and DPLL["validity_check"]:
+        # reset time
+        last_time = time.time()
+        print("[INFO]   ..INITIALIZING..")
         variables, DPLL["assignments"], DPLL["units"] = unit_propagation(variables, DPLL["arguments"][-1], DPLL["assignments"], DPLL["units"])
         DPLL["arguments"][-1], DPLL["assignments"], DPLL["validity_check"] = simplify(DPLL["arguments"][-1], DPLL["assignments"], DPLL["validity_check"])
+        # measure time
+        print(time.time() - last_time)
 
     units = DPLL["units"].copy()
     DPLL["init_assignments"] = DPLL["assignments"].copy()
@@ -53,23 +54,26 @@ def run(heur, input1):
     DPLL["assignments"] = []
 
     # initialize variables again (after first round of simplification):
-    (variables1, varbsCount, varbs) = getVars(DPLL["arguments"][-1])
+    (variables, varbsCount, varbs) = getVars(DPLL["arguments"][-1])
+
+    # this is the random heuristic i.e. randomly predetermining the order of variables to search through
+    variables = random_heuristic(variables)
 
     # start recursive function
 
-    DPLL = solve(DPLL, variables1, heur)
+    DPLL = solve(DPLL, variables, heur)
 
     if not DPLL["validity_check"]:
-        message = 'failure'
+        message = 'Failure! This formula is not satisfiable.\n'
     else:
-        message = 'Success! This formula is satisfiable, with the following assignments: '
+        message = 'Success! This formula is satisfiable, with the following assignments: \n'
 
     for atoms in DPLL["assignments"]:
         assignments.append(atoms)
     for unit in DPLL["units"]:
         units.append(unit)
 
-    return DPLL["init_assignments"], assignments, message, DPLL["backtrack_counter"], units
+    return DPLL["init_assignments"], assignments, message, DPLL["backtrack_counter"], units, DPLL["recursion_depth"]
 
 
 if call.sudoku1:
@@ -89,7 +93,7 @@ elif call.sudoku5:
     version = 'S5'
 else:
     example = os.getcwd()
-    version = "S5"
+    version = "S1"
 
 if __name__ == "__main__":
 
@@ -100,6 +104,7 @@ if __name__ == "__main__":
     units = []
     inits = []
     sudoku_names = []
+    recs = []
     cd = os.getcwd()
 
     if os.path.isdir(example):
@@ -116,7 +121,7 @@ if __name__ == "__main__":
         # reset time
         last_time = time.time()
 
-        initial_assignments, assignments, message, backtrack_counter, unit_literals = run(version, file)
+        initial_assignments, assignments, message, backtrack_counter, unit_literals, recursive_depth = run(version, file)
 
         path = create_output(assignments, sudoku_name, example, version)
 
@@ -129,21 +134,24 @@ if __name__ == "__main__":
         inits.append(len(initial_assignments))
         units.append(len(unit_literals))
         times.append(now_time)
+        recs.append(recursive_depth)
 
         print(message, sorted(assignments, reverse=True))
-        print('Number of initial assignments:', len(initial_assignments))
-        print('Number of assignments:', len(assignments))
-        print('Number of backtracks:', len(backtrack_counter))
-        print('Number of unit literals:', len(unit_literals))
+        print('Number of initial assignments:   ', len(initial_assignments))
+        print('Number of assignments:           ', len(assignments))
+        print('Number of backtracks:            ', len(backtrack_counter))
+        print('Number of unit literals:         ', len(unit_literals))
+        print('Recursive Depth:                 ', recursive_depth)
         print("--- %s seconds ---" % (now_time))
 
         os.chdir(cd)
 
     os.chdir(path)
     collect_test_results(tests, sudoku_names, example, inits, backtracks, units,
-                         times)
-    print(tests)
-    print(times)
-    print(backtracks)
-    print(inits)
-    print(units)
+                         times, recs)
+    # print(tests)
+    print("Puzzle Times:                ", times)
+    print("Nr. of Backtracks:           ", backtracks)
+    print("Nr. of Initial Assignments:  ", inits)
+    print("Nr. of Units Propagated:     ", units)
+    print("Recursive Depths:            ", recs)

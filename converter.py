@@ -24,7 +24,7 @@ def convert2dimacs(file, location, base=10):
                             tmp_val = int(sudoku_matrix[i][j], base+1)
                             value = ((i+1)*((base+1)**2)) + ((j+1)*(base+1)) + tmp_val
                         else:
-                            value = int(sudoku_matrix[i][j] + str(i+1) + str(j+1))
+                            value = int(str(i+1) + str(j+1) + sudoku_matrix[i][j])
                         dimacs.append('{} 0\n'.format(value))
                         f.write('{} 0\n'.format(value))
         counter += 1
