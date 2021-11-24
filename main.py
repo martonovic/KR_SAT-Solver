@@ -21,6 +21,7 @@ def run(heur, input1):
 
     # initialize variables:
     (variables, varbsCount, varbs) = getVars(full_argments)
+    total_states = len(varbs)
 
     # this is the random heuristic i.e. randomly predetermining the order of variables to search through
     variables = random_heuristic(variables)
@@ -37,6 +38,7 @@ def run(heur, input1):
         "first_backtrack": 0,
         "backtrack_counter": [],
         "recursion_depth": 0,
+        "all_assignments": []
     }
 
     sys.setrecursionlimit(10 ** 8)
@@ -48,6 +50,7 @@ def run(heur, input1):
 
     units = DPLL["units"].copy()
     DPLL["init_assignments"] = DPLL["assignments"].copy()
+    DPLL["all_assignments"] = DPLL["assignments"].copy()
     assignments = DPLL["init_assignments"].copy()
     DPLL["units"] = []
     DPLL["assignments"] = []
@@ -69,7 +72,7 @@ def run(heur, input1):
     for unit in DPLL["units"]:
         units.append(unit)
 
-    return DPLL["init_assignments"], assignments, message, DPLL["backtrack_counter"], units
+    return DPLL["init_assignments"], assignments, message, DPLL["backtrack_counter"], units, DPLL["all_assignments"], total_states
 
 
 if call.sudoku1:
@@ -116,8 +119,9 @@ if __name__ == "__main__":
         # reset time
         last_time = time.time()
 
-        initial_assignments, assignments, message, backtrack_counter, unit_literals = run(version, file)
-
+        initial_assignments, assignments, message, backtrack_counter, unit_literals, all_assigns, total_states = run(version, file)
+        all_assigns = set(all_assigns)
+        print('percentage of space searched:', len(all_assigns)/total_states)
         path = create_output(assignments, sudoku_name, example, version)
 
         # measure time
@@ -135,6 +139,7 @@ if __name__ == "__main__":
         print('Number of assignments:', len(assignments))
         print('Number of backtracks:', len(backtrack_counter))
         print('Number of unit literals:', len(unit_literals))
+        print('percentage of space searched:', len(all_assigns)/total_states)
         print("--- %s seconds ---" % (now_time))
 
         os.chdir(cd)

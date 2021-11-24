@@ -9,18 +9,19 @@ def solve(tree: dict, variables: list, heur: str):
     tree["arguments"].append([])
     tree["arguments"][-1], tree["assignments"], tree["validity_check"] = simplify(tree["arguments"][-2], tree["assignments"], tree["validity_check"])
     print('[INFO - ASSIGNMENTS]', '  number of assignments:', len(tree["assignments"]))
-
+    tree["all_assignments"].extend(tree["assignments"].copy())
     # this is just unit propagation
     while any(len(clause) == 1 for clause in tree["arguments"][-1]) and tree["validity_check"]:
         variables, tree["assignments"], tree["units"] = unit_propagation(variables, tree["arguments"][-1], tree["assignments"], tree["units"])
         tree["arguments"][-1], tree["assignments"], tree["validity_check"] = simplify(tree["arguments"][-1], tree["assignments"], tree["validity_check"])
-
+    tree["all_assignments"].extend(tree["assignments"].copy())
     # if no arguments left, then the formula is satisfied
     if not tree["arguments"][-1] and tree["validity_check"]:
         return tree
 
     if len(tree["assignments"]) == len(variables) and not tree["validity_check"] and abs(tree["assignments"][-1]) not in tree["backtrack"]:
         tree["assignments"][-1] = -tree["assignments"][-1]
+        tree["all_assignments"].append(-tree["assignments"][-1].copy())
         tree["recursion_depth"] += 1
         solve(tree, variables, heur)
         return tree
@@ -32,7 +33,8 @@ def solve(tree: dict, variables: list, heur: str):
         varbs = [x for x in variables if (x not in tree["assignments"] and -x not in tree["assignments"])]
         next_lit = jw1_heuristic(varbs, tree["arguments"][-1])
     elif heur == 'S4':
-        next_lit = DLIS_heuristic(tree["arguments"][-1])
+        varbs = [x for x in variables if (x not in tree["assignments"] and -x not in tree["assignments"])]
+        next_lit = DLIS_heuristic(varbs, tree["arguments"][-1])
     elif heur == 'S5':
         varbs = [x for x in variables if (x not in tree["assignments"] and -x not in tree["assignments"])]
         next_lit = sudo_heruistic(tree["init_assignments"] + tree["assignments"], varbs, base=16)
@@ -45,8 +47,9 @@ def solve(tree: dict, variables: list, heur: str):
     if tree["validity_check"]:
 
         tree["assignments"].append(next_lit)
+        tree["all_assignments"].append(next_lit)
         tree["recursion_depth"] += 1
-        solve(tree, variables, heur)
+        solve(tree, variables, heur)   
 
     # otherwise, backtrack...
     else:
@@ -69,6 +72,7 @@ def solve(tree: dict, variables: list, heur: str):
         # also remove last clause simplification step i.e. go to previous list of clauses
         tree["backtrack"].append(abs(tree["assignments"][-1]))
         tree["assignments"][-1] = -tree["assignments"][-1]
+        tree["all_assignments"].append(-tree["assignments"][-1])
         del tree["arguments"][-1]
 
         if tree["first_backtrack"] == abs(tree["assignments"][-1]):

@@ -47,16 +47,17 @@ def jw1_heuristic(literals, clauses):
     return chosen_literal
 
 
-def DLIS_heuristic(clauses):
+def DLIS_heuristic(vars, clauses):
     neg_count = defaultdict(int)
     pos_count = defaultdict(int)
 
     for clause in clauses:
         for literal in clause:
-            if literal < 0:
-                neg_count[literal] += 1
-            else:
-                pos_count[literal] += 1
+            if abs(literal) in vars:
+                if literal < 0:
+                    neg_count[literal] += 1
+                else:
+                    pos_count[literal] += 1
 
 
     neg_chosen_literal = max(neg_count, key=neg_count.get)
