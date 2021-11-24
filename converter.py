@@ -1,8 +1,5 @@
 import numpy as np
 
-b = 16
-loc = 'tests/16x16_sudoku/'
-file = open('tests/16x16_sudoku/16x16.txt', 'r')
 
 def convert2dimacs(file, location, base=10):
     lines = file.readlines()
@@ -28,5 +25,3 @@ def convert2dimacs(file, location, base=10):
                         dimacs.append('{} 0\n'.format(value))
                         f.write('{} 0\n'.format(value))
         counter += 1
-
-convert2dimacs(file, loc, b)

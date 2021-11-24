@@ -1,8 +1,13 @@
 import os, glob
+import converter
+
 
 def concat(rules, location, destination):
     file_loc = os.path.join(os.getcwd(), location)
     os.chdir(file_loc)
+
+    if not os.path.isdir(os.path.join(file_loc, destination)):
+        os.makedirs(os.path.join(file_loc, destination))
 
     # read in all txt files
     files = glob.glob(os.path.join('sudoku*.txt'))
@@ -20,4 +25,9 @@ def concat(rules, location, destination):
                     outfile.write(infile.read())
 
 
-concat('sudoku-rules-16x16.txt', 'tests/16x16_sudoku/', 'out')
+b = 9
+loc = 'tests/damnhard/'
+file = open(loc + 'damnhard.txt', 'r')
+converter.convert2dimacs(file, loc, b)
+
+concat('sudoku-rules-9x9.txt', 'tests/damnhard/', 'out')

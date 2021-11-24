@@ -49,6 +49,7 @@ def run(heur, input1):
 
     units = DPLL["units"].copy()
     DPLL["init_assignments"] = DPLL["assignments"].copy()
+
     assignments = DPLL["init_assignments"].copy()
     DPLL["units"] = []
     DPLL["assignments"] = []
@@ -93,7 +94,7 @@ elif call.sudoku5:
     version = 'S5'
 else:
     example = os.getcwd()
-    version = "S1"
+    version = "S3"
 
 if __name__ == "__main__":
 
@@ -105,6 +106,7 @@ if __name__ == "__main__":
     inits = []
     sudoku_names = []
     recs = []
+    combined_metric = []
     cd = os.getcwd()
 
     if os.path.isdir(example):
@@ -123,6 +125,8 @@ if __name__ == "__main__":
 
         initial_assignments, assignments, message, backtrack_counter, unit_literals, recursive_depth = run(version, file)
 
+        perf_metric = (recursive_depth + len(backtrack_counter) + (len(assignments) - len(unit_literals))**2) / len(initial_assignments)
+
         path = create_output(assignments, sudoku_name, example, version)
 
         # measure time
@@ -135,23 +139,26 @@ if __name__ == "__main__":
         units.append(len(unit_literals))
         times.append(now_time)
         recs.append(recursive_depth)
+        combined_metric.append(perf_metric)
 
         print(message, sorted(assignments, reverse=True))
-        print('Number of initial assignments:   ', len(initial_assignments))
-        print('Number of assignments:           ', len(assignments))
-        print('Number of backtracks:            ', len(backtrack_counter))
-        print('Number of unit literals:         ', len(unit_literals))
+        print('Number of Initial Assignments:   ', len(initial_assignments))
+        print('Number of Assignments:           ', len(assignments))
+        print('Number of Backtracks:            ', len(backtrack_counter))
+        print('Number of Unit Literals:         ', len(unit_literals))
         print('Recursive Depth:                 ', recursive_depth)
+        print('Performance Metric:              ', perf_metric)
         print("--- %s seconds ---" % (now_time))
 
         os.chdir(cd)
 
     os.chdir(path)
     collect_test_results(tests, sudoku_names, example, inits, backtracks, units,
-                         times, recs)
+                         times, recs, combined_metric)
     # print(tests)
     print("Puzzle Times:                ", times)
     print("Nr. of Backtracks:           ", backtracks)
     print("Nr. of Initial Assignments:  ", inits)
     print("Nr. of Units Propagated:     ", units)
     print("Recursive Depths:            ", recs)
+    print("Performance Metric:          ", combined_metric)

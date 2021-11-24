@@ -15,7 +15,7 @@ def create_output(assignments, sudoku_name, directory, version):  # pass difficu
 
 
 def collect_test_results(assignments, sudoku_name, difficulty_level, initial_assignments, backtrack_counter, units,
-                         now_time, recursive_depth):
+                         now_time, recursive_depth, performance_metric):
     filename = 'test_results_file.txt'
     with open(filename, 'w') as f:
         f.write('-----------------------------------------------------------\n')
@@ -27,3 +27,4 @@ def collect_test_results(assignments, sudoku_name, difficulty_level, initial_ass
         f.write('Number of unit literals: {}\n'.format(units))
         f.write('Processing time in seconds: {}\n'.format(now_time))
         f.write('Recursive Depth: {}\n'.format(recursive_depth))
+        f.write('Performance Metric: {}\n'.format(performance_metric))
