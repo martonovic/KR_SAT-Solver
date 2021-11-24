@@ -56,6 +56,9 @@ def DLIS_heuristic(clauses, varbs):
             else:
                 pos_count[literal] += 1
 
+    pos_chosen_literal = None
+    neg_chosen_literal = None
+
     for x in sorted(pos_count, key=pos_count.get, reverse=True):
         if x in varbs:
             pos_chosen_literal = x
@@ -63,7 +66,12 @@ def DLIS_heuristic(clauses, varbs):
         if y in varbs:
             neg_chosen_literal = y
 
-    if pos_count[pos_chosen_literal] > neg_count[neg_chosen_literal]:
+    if pos_chosen_literal and neg_chosen_literal:
+        if pos_count[pos_chosen_literal] > neg_count[neg_chosen_literal]:
+            return pos_chosen_literal
+        else:
+            return neg_chosen_literal
+    elif (pos_chosen_literal and not neg_chosen_literal):
         return pos_chosen_literal
     else:
         return neg_chosen_literal
