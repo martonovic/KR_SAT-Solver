@@ -40,6 +40,7 @@ def solve(tree: dict, variables: list, heur: str):
         for var in variables:
             if var not in tree["assignments"] and -var not in tree["assignments"]:
                 next_lit = var
+                break
 
     # if formula is still satisfiable, then add next assignment from list and go to next level in recursion
     if tree["validity_check"]:
